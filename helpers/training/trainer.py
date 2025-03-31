@@ -2130,9 +2130,14 @@ class Trainer:
                 
                 if self.config.control:
                     # handle condition
-                    control_image = prepared_batch["conditioning_pixel_values"].to(
-                        dtype=self.config.base_weight_dtype
-                    ) #[-1, 1], cuda
+                    if "conditioning_pixel_values" in prepared_batch:
+                        control_image = prepared_batch["conditioning_pixel_values"].to(
+                            dtype=self.config.base_weight_dtype
+                        ) #[-1, 1], cuda
+                    else:
+                        # use black control image when conditioning image is not given
+                        vae_scale_factor = 2 ** (len(self.vae.config.block_out_channels) - 1) if getattr(self, "vae", None) else 8
+                        control_image = -1 * torch.ones((prepared_batch["latents"].shape[2] * vae_scale_factor, prepared_batch["latents"].shape[3] * vae_scale_factor))
                     
                     control_image = self.vae.encode(control_image).latent_dist.sample(generator=None)
                     control_image = (control_image - self.vae.config.shift_factor) * self.vae.config.scaling_factor
@@ -2886,6 +2891,8 @@ class Trainer:
                                 self.accelerator._lycoris_wrapped_network.set_multiplier(
                                     0.0
                                 )
+                            elif self.config.lora_type.lower() == "standard":
+                                self.transformer.set_adapters("default", 0.0)
                             else:
                                 raise ValueError(
                                     f"Cannot train parent-student networks on {self.config.lora_type} model. Only LyCORIS is supported."
@@ -2900,6 +2907,8 @@ class Trainer:
                                 self.accelerator._lycoris_wrapped_network.set_multiplier(
                                     1.0
                                 )
+                            elif self.config.lora_type.lower() == "standard":
+                                self.transformer.set_adapters("default", 1.0)
 
                     training_logger.debug("Predicting noise residual.")
                     model_pred = self.model_predict(
