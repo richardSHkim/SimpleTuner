@@ -69,6 +69,13 @@ if __name__ == "__main__":
 
         trainer.init_trackers()
         trainer.train()
+
+        import requests
+        import os
+        import torch.distributed as dist
+        if os.environ.get("SLACK_ALARM_URL", None) and dist.get_rank() == 0:
+            requests.post(os.environ["SLACK_ALARM_URL"], json={"text": "Train finished."})
+
     except KeyboardInterrupt:
         if StateTracker.get_webhook_handler() is not None:
             StateTracker.get_webhook_handler().send(
@@ -83,5 +90,12 @@ if __name__ == "__main__":
             )
         print(e)
         print(traceback.format_exc())
+
+        import requests
+        import os
+        import torch.distributed as dist
+        if os.environ.get("SLACK_ALARM_URL", None) and dist.get_rank() == 0:
+            requests.post(os.environ["SLACK_ALARM_URL"], json={"text": f"Training has failed: {e}"})
+    
     if trainer is not None and trainer.bf is not None:
         trainer.bf.stop_fetching()
