@@ -55,9 +55,12 @@ def load_diffusion_model(args, weight_dtype):
     elif (
         args.model_family.lower() == "flux" and not args.flux_attention_masked_training
     ):
-        from helpers.models.flux.transformer import (
-            FluxTransformer2DModelWithMasking as FluxTransformer2DModel,
-        )
+        if args.controlnet:
+            from diffusers import FluxTransformer2DModel
+        else:
+            from helpers.models.flux.transformer import (
+                FluxTransformer2DModelWithMasking as FluxTransformer2DModel,
+            )
         import torch
 
         if torch.cuda.is_available():

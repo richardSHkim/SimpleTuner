@@ -2259,7 +2259,7 @@ class Trainer:
                     )
                     control_latents = self.vae.encode(controlnet_image).latent_dist.sample()
                     control_latents = (control_latents - self.vae.config.shift_factor) * self.vae.config.scaling_factor
-                    control_image = self.controlnet._pack_latents(
+                    control_image = pack_latents(
                         control_latents,
                         controlnet_image.shape[0],
                         control_latents.shape[1],

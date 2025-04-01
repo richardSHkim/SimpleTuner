@@ -1482,6 +1482,7 @@ class Validation:
                             del pipeline_kwargs["no_cfg_until_timestep"]
                             pipeline_kwargs["control_image"] = pipeline_kwargs.pop("image")
                     if StateTracker.get_args().controlnet:
+                        del pipeline_kwargs["strength"]
                         del pipeline_kwargs["no_cfg_until_timestep"]
                         pipeline_kwargs["control_image"] = pipeline_kwargs.pop("image")
                 if self.args.model_family == "sana":
