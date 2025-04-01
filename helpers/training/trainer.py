@@ -907,8 +907,8 @@ class Trainer:
     def init_trainable_peft_adapter(self):
         if "lora" not in self.config.model_type:
             return
-        if self.config.controlnet:
-            raise ValueError("Cannot train LoRA with ControlNet.")
+        # if self.config.controlnet:
+        #     raise ValueError("Cannot train LoRA with ControlNet.")
         if "standard" == self.config.lora_type.lower():
             lora_info_msg = f"Using LoRA training mode (rank={self.config.lora_rank})"
             logger.info(lora_info_msg)
@@ -950,7 +950,10 @@ class Trainer:
                     target_modules=target_modules,
                     use_dora=self.config.use_dora,
                 )
-                self.transformer.add_adapter(transformer_lora_config)
+                if self.controlnet is not None:
+                    self.controlnet.add_adapter(transformer_lora_config)
+                else:
+                    self.transformer.add_adapter(transformer_lora_config)
                 if self.config.init_lora:
                     addkeys, misskeys = load_lora_weights(
                         {"transformer": self.transformer},

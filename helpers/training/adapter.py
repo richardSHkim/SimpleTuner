@@ -21,6 +21,25 @@ def determine_adapter_target_modules(args, unet, transformer):
                 "to_out.0",
                 "to_add_out",
             ]
+        elif args.flux_lora_target == "all+ffs+embedder+controlnet_embedder":
+            target_modules = [
+                "controlnet_x_embedder",
+                "x_embedder",
+                "to_k",
+                "to_q",
+                "to_v",
+                "to_out.0",
+                "add_k_proj",
+                "add_q_proj",
+                "add_v_proj",
+                "to_add_out",
+                "ff.net.0.proj",
+                "ff.net.2",
+                "ff_context.net.0.proj",
+                "ff_context.net.2",
+                "proj_mlp",
+                "proj_out",
+            ]
         elif args.flux_lora_target == "all+ffs+embedder":
             target_modules = [
                 "x_embedder",

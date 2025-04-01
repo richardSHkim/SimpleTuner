@@ -127,6 +127,7 @@ def get_argument_parser():
             "all",
             "all+ffs",
             "all+ffs+embedder",
+            "all+ffs+embedder+controlnet_embedder",
             "ai-toolkit",
             "tiny",
             "nano",
@@ -2456,8 +2457,8 @@ def parse_cmdline_args(input_args=None, exit_on_error: bool = False):
     if args.timestep_bias_portion < 0.0 or args.timestep_bias_portion > 1.0:
         raise ValueError("Timestep bias portion must be between 0.0 and 1.0.")
 
-    if args.controlnet and "lora" in args.model_type:
-        raise ValueError("ControlNet is not supported for LoRA models.")
+    # if args.controlnet and "lora" in args.model_type:
+    #     raise ValueError("ControlNet is not supported for LoRA models.")
 
     if args.metadata_update_interval < 60:
         raise ValueError("Metadata update interval must be at least 60 seconds.")

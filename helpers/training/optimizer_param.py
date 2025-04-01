@@ -713,10 +713,10 @@ def determine_params_to_optimize(
                 "Full model tuning does not currently support text encoder training."
             )
     elif "lora" in args.model_type:
-        if args.controlnet:
-            raise ValueError(
-                "SimpleTuner does not currently support training a ControlNet LoRA."
-            )
+        # if args.controlnet:
+        #     raise ValueError(
+        #         "SimpleTuner does not currently support training a ControlNet LoRA."
+        #     )
         if unet is not None:
             params_to_optimize = list(
                 filter(lambda p: p.requires_grad, unet.parameters())
@@ -724,6 +724,10 @@ def determine_params_to_optimize(
         if transformer is not None:
             params_to_optimize = list(
                 filter(lambda p: p.requires_grad, transformer.parameters())
+            )
+        if controlnet is not None:
+            params_to_optimize = list(
+                filter(lambda p: p.requires_grad, controlnet.parameters())
             )
         if args.train_text_encoder:
             if args.model_family in ["sd3", "pixart_sigma"]:
