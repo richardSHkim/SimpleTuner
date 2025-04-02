@@ -108,6 +108,7 @@ class SaveHookManager:
         args,
         unet,
         transformer,
+        controlnet,
         ema_model,
         text_encoder_1,
         text_encoder_2,
@@ -118,6 +119,7 @@ class SaveHookManager:
         self.args = args
         self.unet = unet
         self.transformer = transformer
+        self.controlnet = controlnet
         if self.unet is not None and self.transformer is not None:
             raise ValueError("Both `unet` and `transformer` cannot be set.")
         self.text_encoder_1 = text_encoder_1
@@ -267,11 +269,14 @@ class SaveHookManager:
                 weights.pop()
 
         if self.args.model_family == "flux":
-            self.pipeline_class.save_lora_weights(
-                output_dir,
-                transformer_lora_layers=transformer_lora_layers_to_save,
-                text_encoder_lora_layers=text_encoder_1_lora_layers_to_save,
-            )
+            if self.args.controlnet:
+                self.controlnet.save_lora_adapter(output_dir)
+            else:
+                self.pipeline_class.save_lora_weights(
+                    output_dir,
+                    transformer_lora_layers=transformer_lora_layers_to_save,
+                    text_encoder_lora_layers=text_encoder_1_lora_layers_to_save,
+                )
         elif self.args.model_family == "sd3":
             self.pipeline_class.save_lora_weights(
                 output_dir,

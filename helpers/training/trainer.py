@@ -1343,6 +1343,7 @@ class Trainer:
             args=self.config,
             unet=self.unet,
             transformer=self.transformer,
+            controlnet=self.controlnet if self.config.controlnet else None,
             ema_model=self.ema_model,
             accelerator=self.accelerator,
             text_encoder_1=self.text_encoder_1,
