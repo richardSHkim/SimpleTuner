@@ -992,9 +992,11 @@ class Trainer:
             self._send_webhook_msg(message="Using lycoris training mode.")
 
             model_for_lycoris_wrap = None
-            if self.transformer is not None:
+            if self.controlnet is not None:
+                model_for_lycoris_wrap = self.controlnet
+            elif self.transformer is not None:
                 model_for_lycoris_wrap = self.transformer
-            if self.unet is not None:
+            elif self.unet is not None:
                 model_for_lycoris_wrap = self.unet
 
             if self.config.init_lora is not None:
