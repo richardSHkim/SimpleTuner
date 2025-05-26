@@ -40,6 +40,7 @@ class MultiAspectSampler(torch.utils.data.Sampler):
         instance_prompt: str = None,
         conditioning_type: str = None,
         is_regularisation_data: bool = False,
+        caption_dir: str = None,
     ):
         """
         Initializes the sampler with provided settings.
@@ -90,6 +91,7 @@ class MultiAspectSampler(torch.utils.data.Sampler):
         self.exhausted_buckets = []
         self.buckets = self.load_buckets()
         self.state_manager = BucketStateManager(self.id)
+        self.caption_dir = caption_dir
 
     def save_state(self, state_path: str):
         """
@@ -150,7 +152,8 @@ class MultiAspectSampler(torch.utils.data.Sampler):
             []
         )  # [tuple(validation_shortname, validation_prompt, validation_sample)]
         for img_idx in range(batch_size):
-            image_path = self._yield_random_image()
+            # image_path = self._yield_random_image()
+            image_path = self.metadata_backend.aspect_ratio_bucket_indices[self.buckets[0]][img_idx%len(self.metadata_backend.aspect_ratio_bucket_indices[self.buckets[0]])]
             image_data = self.data_backend.read_image(image_path)
             image_metadata = self.metadata_backend.get_metadata_by_filepath(image_path)
             training_sample = TrainingSample(
@@ -169,6 +172,7 @@ class MultiAspectSampler(torch.utils.data.Sampler):
                 use_captions=self.use_captions,
                 prepend_instance_prompt=self.prepend_instance_prompt,
                 instance_prompt=self.instance_prompt,
+                caption_dir=self.caption_dir,
             )
             if type(validation_prompt) == list:
                 validation_prompt = random.choice(validation_prompt)
@@ -440,6 +444,7 @@ class MultiAspectSampler(torch.utils.data.Sampler):
                 use_captions=self.use_captions,
                 prepend_instance_prompt=self.prepend_instance_prompt,
                 instance_prompt=self.instance_prompt,
+                caption_dir=self.caption_dir,
             )
             if type(instance_prompt) == list:
                 instance_prompt = random.choice(instance_prompt)

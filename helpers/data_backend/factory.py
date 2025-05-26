@@ -982,6 +982,7 @@ def configure_multi_databackend(args: dict, accelerator, text_encoders, tokenize
             instance_prompt=backend.get("instance_prompt", args.instance_prompt),
             conditioning_type=conditioning_type,
             is_regularisation_data=is_regularisation_data,
+            caption_dir=backend.get("caption_dir", None),
         )
         if init_backend["sampler"].caption_strategy == "parquet":
             configure_parquet_database(backend, args, init_backend["data_backend"])
@@ -1024,6 +1025,7 @@ def configure_multi_databackend(args: dict, accelerator, text_encoders, tokenize
                 instance_prompt=instance_prompt,
                 use_captions=use_captions,
                 caption_strategy=backend.get("caption_strategy", args.caption_strategy),
+                caption_dir=backend.get("caption_dir"),
             )
             logger.debug(
                 f"Pre-computing text embeds / updating cache. We have {len(captions)} captions to process, though these will be filtered next."

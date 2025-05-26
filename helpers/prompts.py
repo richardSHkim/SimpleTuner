@@ -307,6 +307,7 @@ class PromptHandler:
         prepend_instance_prompt: bool,
         data_backend: BaseDataBackend,
         instance_prompt: str = None,
+        caption_dir: str = None,
     ) -> str:
         if not use_captions:
             if not instance_prompt:
@@ -314,7 +315,10 @@ class PromptHandler:
                     "Instance prompt is required when instance_prompt_only is enabled."
                 )
             return instance_prompt
-        caption_file = os.path.splitext(image_path)[0] + ".txt"
+        if caption_dir:
+            caption_file = os.path.join(caption_dir, os.path.splitext(os.path.basename(image_path))[0] + ".txt")
+        else:
+            caption_file = os.path.splitext(image_path)[0] + ".txt"
         if not data_backend.exists(caption_file):
             raise FileNotFoundError(f"Caption file {caption_file} not found.")
         try:
@@ -348,6 +352,7 @@ class PromptHandler:
         data_backend: BaseDataBackend,
         instance_prompt: str = None,
         sampler_backend_id: str = None,
+        caption_dir: str = None,
     ) -> str:
         """Pull a prompt for an image file like magic, using one of the available caption strategies.
 
@@ -378,6 +383,7 @@ class PromptHandler:
                 prepend_instance_prompt=prepend_instance_prompt,
                 instance_prompt=instance_prompt,
                 data_backend=data_backend,
+                caption_dir=caption_dir,
             )
         elif caption_strategy == "parquet":
             # Can return multiple captions, if the field is a list.
@@ -408,6 +414,7 @@ class PromptHandler:
         data_backend: BaseDataBackend,
         caption_strategy: str,
         instance_prompt: str = None,
+        caption_dir: str = None,
     ) -> list:
         captions = []
         images_missing_captions = []
@@ -451,6 +458,7 @@ class PromptHandler:
                         prepend_instance_prompt=prepend_instance_prompt,
                         instance_prompt=instance_prompt,
                         data_backend=data_backend,
+                        caption_dir=caption_dir,
                     )
                 elif caption_strategy == "parquet":
                     caption = PromptHandler.prepare_instance_prompt_from_parquet(
